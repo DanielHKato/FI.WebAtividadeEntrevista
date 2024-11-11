@@ -2,30 +2,28 @@
 using FI.AtividadeEntrevista.DML;
 using FI.AtividadeEntrevista.Interfaces;
 using System.Collections.Generic;
+using System.Configuration;
 
 namespace FI.AtividadeEntrevista.BLL
 {
     public class BoBeneficiario : BoCRUDBasico<Beneficiario>, IBllVerificarExistencia
     {
-        protected IDalVerificarExistencia _daoCPF;
-        public BoBeneficiario() : base()
-        {
-            _dao = new DaoBeneficiario(
-                "FI_SP_DelBeneficiario", 
-                "FI_SP_AltBeneficiario", 
-                "FI_SP_IncBeneficiario", 
-                "FI_SP_ConsBeneficiario",
-                "FI_SP_ConsBeneficiario", 
-                "FI_SP_PesqBeneficiarios", 
-                "FI_SP_VerificaBeneficiario"
-            );
+        protected IDalVerificarExistencia _daoVerificarExistencia;
 
-            _daoCPF = (IDalVerificarExistencia) _dao;
+        public BoBeneficiario(IDalCRUDBasico<Beneficiario> dao, IDalVerificarExistenciaBeneficiario daoVerificarExistencia) : base()
+        {
+            _dao = dao;
+            _daoVerificarExistencia = daoVerificarExistencia;
         }
 
+        /// <summary>
+        /// Invoca o método VerificarExistencia na base de dados
+        /// </summary>
+        /// <param name="parametrosPesquisa">Parâmetros adicionais da pesquisa</param>
+        /// <returns>Dado existe na base (true) ou não (false)</returns>
         public bool VerificarExistencia(Dictionary<string, string> parametrosPesquisa)
         {
-            return _daoCPF.VerificarExistencia(parametrosPesquisa);
+            return _daoVerificarExistencia.VerificarExistencia(parametrosPesquisa);
         }
     }
 }

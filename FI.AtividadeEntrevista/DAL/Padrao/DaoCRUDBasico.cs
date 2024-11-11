@@ -11,7 +11,7 @@ namespace FI.AtividadeEntrevista.DAL.Padrao
     /// Classe genérica que implementa uma classe básica (neste projeto) de operações CRUD na base de dados
     /// </summary>
     /// <typeparam name="T">Modelo de referência para os mapeamentos</typeparam>
-    internal class DaoCRUDBasico<T> : AcessoDados, IDalCRUDBasico<T> where T : class, new()
+    public class DaoCRUDBasico<T> : AcessoDados, IDalCRUDBasico<T> where T : class, new()
     {
         protected List<PropertyInfo> _propriedades;
 
@@ -324,6 +324,29 @@ namespace FI.AtividadeEntrevista.DAL.Padrao
                    ds.Tables != null &&
                    ds.Tables.Count >= indiceTabela &&
                    ds.Tables[indiceTabela].Rows.Count > 0;
+        }
+
+
+        /// <summary>
+        /// Método que remove parâmetros não utilizados de uma lista de SqlParameters
+        /// </summary>
+        /// <param name="nomeParametrosDesnecessarios">Lista contendo os nomes dos parâmetros que devem ser removidos</param>
+        /// <param name="parameters">Lista de SqlParameters que será manipulada</param>
+        /// <returns>Sempre true</returns>
+        /// <remarks>Método otimizado para branchless</remarks>
+        protected bool RemoverParametrosNaoNecessarios(List<string> nomeParametrosDesnecessarios, List<SqlParameter> parameters)
+        {
+            foreach (var nomeParametroDesnecessario in nomeParametrosDesnecessarios)
+            {
+                parameters = parameters
+                    .Where(p => !p.ParameterName.Equals(nomeParametroDesnecessario))
+                    .ToList();
+
+                //Implementação alternativa, mas pode causar erro se o ParameterName não for encontrado
+                //parameters.Remove(parameters.First(p => p.ParameterName.Equals(nomeParametroDesnecessario)));
+            }
+
+            return true;
         }
 
         #endregion

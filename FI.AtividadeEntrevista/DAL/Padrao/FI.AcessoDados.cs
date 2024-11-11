@@ -5,7 +5,7 @@ using System.Data.SqlClient;
 
 namespace FI.AtividadeEntrevista.DAL
 {
-    internal class AcessoDados
+    public class AcessoDados
     {
         private string stringDeConexao
         {

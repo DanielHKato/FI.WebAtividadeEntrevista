@@ -1,80 +1,27 @@
-﻿using FI.AtividadeEntrevista.Interfaces;
+﻿using FI.AtividadeEntrevista.DML;
+using FI.AtividadeEntrevista.Interfaces;
 using System.Collections.Generic;
 
 namespace FI.AtividadeEntrevista.BLL
 {
-    public class BoCliente : IBllVerificarExistencia
+    public class BoCliente : BoCRUDBasico<Cliente>, IBllVerificarExistencia
     {
-        /// <summary>
-        /// Inclui um novo cliente
-        /// </summary>
-        /// <param name="cliente">Objeto de cliente</param>
-        public long Incluir(DML.Cliente cliente)
+        protected IDalVerificarExistencia _daoVerificarExistencia;
+
+        public BoCliente(IDalCRUDBasico<Cliente> dao, IDalVerificarExistenciaCliente daoVerificarExistencia) : base()
         {
-            DAL.DaoCliente cli = new DAL.DaoCliente();
-            return cli.Incluir(cliente);
+            _dao = dao;
+            _daoVerificarExistencia = daoVerificarExistencia;
         }
 
         /// <summary>
-        /// Altera um cliente
+        /// Invoca o método VerificarExistencia na base de dados
         /// </summary>
-        /// <param name="cliente">Objeto de cliente</param>
-        public void Alterar(DML.Cliente cliente)
-        {
-            DAL.DaoCliente cli = new DAL.DaoCliente();
-            cli.Alterar(cliente);
-        }
-
-        /// <summary>
-        /// Consulta o cliente pelo id
-        /// </summary>
-        /// <param name="id">id do cliente</param>
-        /// <returns></returns>
-        public DML.Cliente Consultar(long id)
-        {
-            DAL.DaoCliente cli = new DAL.DaoCliente();
-            return cli.Consultar(id);
-        }
-
-        /// <summary>
-        /// Excluir o cliente pelo id
-        /// </summary>
-        /// <param name="id">id do cliente</param>
-        /// <returns></returns>
-        public void Excluir(long id)
-        {
-            DAL.DaoCliente cli = new DAL.DaoCliente();
-            cli.Excluir(id);
-        }
-
-        /// <summary>
-        /// Lista os clientes
-        /// </summary>
-        public List<DML.Cliente> Listar()
-        {
-            DAL.DaoCliente cli = new DAL.DaoCliente();
-            return cli.Listar();
-        }
-
-        /// <summary>
-        /// Lista os clientes
-        /// </summary>
-        public List<DML.Cliente> Pesquisa(int iniciarEm, int quantidade, string campoOrdenacao, bool crescente, out int qtd)
-        {
-            DAL.DaoCliente cli = new DAL.DaoCliente();
-            return cli.Pesquisa(iniciarEm,  quantidade, campoOrdenacao, crescente, out qtd);
-        }
-
-        /// <summary>
-        /// VerificaExistencia
-        /// </summary>
-        /// <param name="CPF"></param>
-        /// <param name="idClienteParaExclirDaPesquisa">[OPCIONAL] Informa um ID de Cliente para excluir da pesquisa (verifique a validação de CPF na edição do cliente)</param>
-        /// <returns></returns>
+        /// <param name="parametrosPesquisa">Parâmetros adicionais da pesquisa</param>
+        /// <returns>Dado existe na base (true) ou não (false)</returns>
         public bool VerificarExistencia(Dictionary<string, string> parametrosPesquisa)
         {
-            DAL.DaoCliente cli = new DAL.DaoCliente();
-            return cli.VerificarExistencia(parametrosPesquisa);
+            return _daoVerificarExistencia.VerificarExistencia(parametrosPesquisa);
         }
     }
 }

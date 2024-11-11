@@ -2,14 +2,30 @@
 using FI.AtividadeEntrevista.DML;
 using FI.AtividadeEntrevista.Interfaces;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data.SqlClient;
 using System.Linq;
 
 namespace FI.AtividadeEntrevista.DAL.Beneficiarios
 {
-    internal class DaoBeneficiario : DaoCRUDBasico<Beneficiario>, IDalVerificarExistencia
+    public class DaoBeneficiario : 
+        DaoCRUDBasico<Beneficiario>, 
+        IDalVerificarExistencia, 
+        IDalVerificarExistenciaBeneficiario
     {
         private readonly string _nomeProcedureVerificarExistencia = string.Empty;
+
+        public DaoBeneficiario() : base(
+            ConfigurationManager.AppSettings["ProcedureName_Beneficiario_Deletar"],
+            ConfigurationManager.AppSettings["ProcedureName_Beneficiario_Alterar"],
+            ConfigurationManager.AppSettings["ProcedureName_Beneficiario_Incluir"],
+            ConfigurationManager.AppSettings["ProcedureName_Beneficiario_Consultar"],
+            ConfigurationManager.AppSettings["ProcedureName_Beneficiario_Listar"],
+            ConfigurationManager.AppSettings["ProcedureName_Beneficiario_Pesquisar"]
+        )
+        {
+            _nomeProcedureVerificarExistencia = ConfigurationManager.AppSettings["ProcedureName_Beneficiario_Verificar"];
+        }
 
         public DaoBeneficiario(
             string nomeProcedureExcluir, 

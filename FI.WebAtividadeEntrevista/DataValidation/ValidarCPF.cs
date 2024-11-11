@@ -124,7 +124,7 @@ namespace FI.WebAtividadeEntrevista.DataValidation
             var formatoValido = !_executarValidacaoFormatoCPF || (ValidarFormatoCPF(value) || ValidationUtil.GerarErrorResult(_mensagemDeErroParaFormatoDeCPFInvalido, out result));
             var digitoValido = formatoValido && (ValidarDigitoVerificadorCPF(value) || ValidationUtil.GerarErrorResult(_mensagemDeErroParaDigitosInvalidos, out result));
             var cpfNaoCadastradoNaBase = digitoValido && 
-                (!_verificarSeCPFEstaCadastradoNaBase || (ValidarCPFNaoCadastradoNaBaseDeDados(value, _tipoVerificacaoExistencia, parametrosAdicionais) || ValidationUtil.GerarErrorResult(_mensagemDeErroParaCPFJaCadastrado, out result)));
+                (!_verificarSeCPFEstaCadastradoNaBase || (ValidarCPFNaoCadastradoNaBaseDeDados(value, _tipoVerificacaoExistencia, parametrosAdicionais, context) || ValidationUtil.GerarErrorResult(_mensagemDeErroParaCPFJaCadastrado, out result)));
 
             return result;
         }
@@ -231,9 +231,9 @@ namespace FI.WebAtividadeEntrevista.DataValidation
         /// <param name="tipoVerificacaoExistencia">Corresponde ao tipo da origem da base de dados para verificar o CPF</param>
         /// <param name="parametrosAdicionais">Informações adicionais para configurar a verificação, como por exemplo Id de Clientes</param>
         /// <returns>CPF não cadastrado (true) ou já cadastrado (false)</returns>
-        private static bool ValidarCPFNaoCadastradoNaBaseDeDados(object value, EnumTipoVerificacaoExistencia tipoVerificacaoExistencia, Dictionary<string, string> parametrosAdicionais)
+        private static bool ValidarCPFNaoCadastradoNaBaseDeDados(object value, EnumTipoVerificacaoExistencia tipoVerificacaoExistencia, Dictionary<string, string> parametrosAdicionais, ValidationContext context)
         {
-            var validador = ObterVerificarExistencia(tipoVerificacaoExistencia);
+            var validador = ObterVerificarExistencia(tipoVerificacaoExistencia, context);
             var cpf = ValidationUtil.ConverterParaString(value);
             var parametros = new Dictionary<string, string>() { { "CPF", cpf } };
 
@@ -253,9 +253,43 @@ namespace FI.WebAtividadeEntrevista.DataValidation
         /// </summary>
         /// <param name="tipoVerificacaoExistencia">Enum que define o tipo de base de dados dos CPFs</param>
         /// <returns>instância de um validador de CPFs</returns>
-        private static IBllVerificarExistencia ObterVerificarExistencia(EnumTipoVerificacaoExistencia tipoVerificacaoExistencia)
+        private static IBllVerificarExistencia ObterVerificarExistencia(EnumTipoVerificacaoExistencia tipoVerificacaoExistencia, ValidationContext context)
         {
-            return new VerificarExistenciaFactory().ObterVerificarExistencia(tipoVerificacaoExistencia);
+            IVerificarExistenciaFactory factory;
+            var contextoValido = context != null;
+            var contextoTemServicoNecessario = contextoValido && context.GetService(typeof(IVerificarExistenciaFactory)) != null;
+            var verificarExistenciaFactoryObtida = (contextoTemServicoNecessario && 
+                    ObterInstanciaFactoryDoValidationContext(context, out factory)) || 
+                ObterInstanciaFactoryPadrao(out factory);
+
+            return factory.ObterVerificarExistencia(tipoVerificacaoExistencia);
+        }
+
+        /// <summary>
+        /// Obtém uma instância de IVerificarExistenciaFactory do ValidationContext (Services)
+        /// </summary>
+        /// <param name="context">ValidationContext</param>
+        /// <param name="instancia">Variável que vai receber o objeto IVerificarExistenciaFactory recuperado</param>
+        /// <returns>Sempre true</returns>
+        /// <remarks>Método otimizado para branchless</remarks>
+        private static bool ObterInstanciaFactoryDoValidationContext(ValidationContext context, out IVerificarExistenciaFactory instancia)
+        {
+            instancia = (IVerificarExistenciaFactory) context.GetService(typeof(IVerificarExistenciaFactory));
+
+            return true;
+        }
+
+        /// <summary>
+        /// Obtém uma instância padrão de IVerificarExistenciaFactory
+        /// </summary>
+        /// <param name="instancia">Variável que vai receber o objeto IVerificarExistenciaFactory recuperado</param>
+        /// <returns>Sempre true</returns>
+        /// <remarks>Método otimizado para branchless</remarks>
+        private static bool ObterInstanciaFactoryPadrao(out IVerificarExistenciaFactory instancia)
+        {
+            instancia = new VerificarExistenciaFactory();
+
+            return true;
         }
 
         /// <summary>

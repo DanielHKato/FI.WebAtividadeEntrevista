@@ -1,5 +1,4 @@
-﻿using FI.AtividadeEntrevista.BLL;
-using FI.AtividadeEntrevista.DML;
+﻿using FI.AtividadeEntrevista.DML;
 using FI.AtividadeEntrevista.Interfaces;
 using FI.WebAtividadeEntrevista.Models;
 using System;
@@ -13,9 +12,9 @@ namespace FI.WebAtividadeEntrevista.Controllers
     {
         private IBllCRUDBasico<Beneficiario> _bo;
 
-        public BeneficiarioController()
+        public BeneficiarioController(IBllCRUDBasico<Beneficiario> boBeneficiario)
         {
-            _bo = new BoBeneficiario();
+            _bo = boBeneficiario;
         }
 
         // GET: Beneficiario

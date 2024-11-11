@@ -5,16 +5,23 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
 using FI.WebAtividadeEntrevista.Models;
+using FI.AtividadeEntrevista.Interfaces;
 
 namespace WebAtividadeEntrevista.Controllers
 {
     public class ClienteController : Controller
     {
+        private IBllCRUDBasico<Cliente> _bo;
+
+        public ClienteController(IBllCRUDBasico<Cliente> bo)
+        {
+            _bo = bo;
+        }
+
         public ActionResult Index()
         {
             return View();
         }
-
 
         public ActionResult Incluir()
         {
@@ -24,8 +31,6 @@ namespace WebAtividadeEntrevista.Controllers
         [HttpPost]
         public JsonResult Incluir(InserirClienteModel model)
         {
-            BoCliente bo = new BoCliente();
-            
             if (!this.ModelState.IsValid)
             {
                 List<string> erros = (from item in ModelState.Values
@@ -38,7 +43,7 @@ namespace WebAtividadeEntrevista.Controllers
             else
             {
                 
-                model.Id = bo.Incluir(new Cliente()
+                model.Id = _bo.Incluir(new Cliente()
                 {                    
                     CEP = model.CEP,
                     Cidade = model.Cidade,
@@ -60,8 +65,6 @@ namespace WebAtividadeEntrevista.Controllers
         [HttpPost]
         public JsonResult Alterar(AlterarClienteModel model)
         {
-            BoCliente bo = new BoCliente();
-       
             if (!this.ModelState.IsValid)
             {
                 List<string> erros = (from item in ModelState.Values
@@ -69,11 +72,12 @@ namespace WebAtividadeEntrevista.Controllers
                                       select error.ErrorMessage).ToList();
 
                 Response.StatusCode = 400;
+
                 return Json(string.Join(Environment.NewLine, erros));
             }
             else
             {
-                bo.Alterar(new Cliente()
+                _bo.Alterar(new Cliente()
                 {
                     Id = model.Id,
                     CEP = model.CEP,
@@ -95,8 +99,7 @@ namespace WebAtividadeEntrevista.Controllers
         [HttpGet]
         public ActionResult Alterar(long id)
         {
-            BoCliente bo = new BoCliente();
-            Cliente cliente = bo.Consultar(id);
+            Cliente cliente = _bo.Consultar(id);
             AlterarClienteModel model = null;
 
             if (cliente != null)
@@ -123,23 +126,45 @@ namespace WebAtividadeEntrevista.Controllers
         [HttpPost]
         public JsonResult ClienteList(int jtStartIndex = 0, int jtPageSize = 0, string jtSorting = null)
         {
-            try
+            int qtd = 0;
+            var campo = string.Empty;
+            var crescente = string.Empty;
+            var ordemCrescente = true;
+
+            if (jtSorting != null)
             {
-                int qtd = 0;
-                string campo = string.Empty;
-                string crescente = string.Empty;
                 string[] array = jtSorting.Split(' ');
 
                 if (array.Length > 0)
-                    campo = array[0];
+                {
+                    campo = array[0].ToUpper();
 
-                if (array.Length > 1)
-                    crescente = array[1];
+                    if (array.Length > 1)
+                    {
+                        crescente = array[1];
 
-                List<Cliente> clientes = new BoCliente().Pesquisa(jtStartIndex, jtPageSize, campo, crescente.Equals("ASC", StringComparison.InvariantCultureIgnoreCase), out qtd);
+                        ordemCrescente = crescente.Trim().Equals("ASC", StringComparison.InvariantCultureIgnoreCase);
+                    }
+                }
+            }
 
-                //Return result to jTable
-                return Json(new { Result = "OK", Records = clientes, TotalRecordCount = qtd });
+            try
+            {
+                var clientes = _bo.Pesquisa(
+                    jtStartIndex,
+                    jtPageSize,
+                    campo,
+                    ordemCrescente,
+                    out qtd,
+                    new Dictionary<string, string>() 
+                );
+
+                return Json(new
+                {
+                    Result = "OK",
+                    Records = clientes,
+                    TotalRecordCount = qtd
+                });
             }
             catch (Exception ex)
             {
