@@ -1,0 +1,63 @@
+﻿@model FI.WebAtividadeEntrevista.Models.AlterarClienteModel
+@{
+    ViewBag.Title = "Alterar Cliente";
+}
+@section scripts{
+    <script>
+        var urlPost = '@Url.Action("Alterar", "Cliente", new { area = "" })';
+        var obj = @Html.Raw(Json.Encode(Model));
+        var urlRetorno = '@Url.Action("Index", "Cliente", new { area = "" })';
+        var beneficiariosConfig = {
+            isLoaded: false,
+            mainContainer: '#beneficiarios',
+            btnOpenBeneficiariosForm: '#btnOpenBeneficiariosForm',    //Clientes/forms.cshtml
+            ClientId: @Model.Id,
+            form: {
+                id: '#formBeneficiario',
+                formTitle: '#formTitle',
+                fields: {
+                    Nome: '#Nome',
+                    CPF: '#CPF',
+                    Id: '#BeneficiarioId'
+                },
+                buttons: {
+                    btnSalvar: '#btnSalvar',
+                    btnCancelar: '#btnCancelar'
+                },
+                Url: '@Url.Action("Index", "Beneficiario", new { area = "" })',
+                incluirUrl: '@Url.Action("Incluir", "Beneficiario", new { area = "" })',
+                alterarUrl: '@Url.Action("Alterar", "Beneficiario", new { area = "" })',
+                excluirUrl: '@Url.Action("Excluir", "Beneficiario", new { area = "" })',
+                consultarUrl: '@Url.Action("Consultar", "Beneficiario", new { area = "" })'
+            },
+            gridTable: {
+                mainContainer: '#gridBeneficiarios',
+                listUrl: '@Url.Action("BeneficiarioList", "Beneficiario", new { area = "" })'
+            },
+            gui: {
+                tituloGrid: '@Messages.FormBeneficiarios_TituloGrid',
+                labelBotaoAlterar: '@Messages.FormBeneficiarios_BotaoAlterar',
+                labelBotaoExcluir: '@Messages.FormBeneficiarios_BotaoExcluir',
+                labelBotaoSalvarCadastro: '@Messages.FormBeneficiarios_BotaoCadastrar',
+                labelBotaoSalvarEdicao: '@Messages.FormBeneficiarios_BotaoSalvar'
+            },
+            mensagens: {
+                erro: {
+                    titulo: '@Messages.FormBeneficiarios_Erro_TituloModal',
+                    erroServidor: '@Messages.FormBeneficiarios_Erro_ErroInterno',
+                    erroDesconhecido: '@Messages.FormBeneficiarios_Erro_ErroDesconhecido'
+                },
+                requisicaoSucesso: '@Messages.FormBeneficiarios_RequisicaoSucesso'
+            }
+        };
+
+        $(document).ready(function () {
+            $('#formCadastro #CPF').inputmask("999.999.999-99");
+        });
+    </script>
+    @Scripts.Render("~/bundles/altClientes")
+    @Scripts.Render("~/bundles/inputmask")
+    @Scripts.Render("~/bundles/Beneficiarios")
+}
+<h2>@Html.Raw(ViewBag.Title)</h2>
+@Html.Partial("Forms")

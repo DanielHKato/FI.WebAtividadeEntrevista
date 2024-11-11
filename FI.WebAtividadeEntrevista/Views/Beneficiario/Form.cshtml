@@ -1,0 +1,45 @@
+﻿@using FI.WebAtividadeEntrevista.Resources
+
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h4 class="modal-title" id="formTitle">@Messages.FormBeneficiarios_Titulo</h4>
+        </div>
+        <div class="modal-body">
+            <form id="formBeneficiario" method="post">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="CPF">@Messages.FormBeneficiarios_CPF:</label>
+                            <input required="required" type="text" class="form-control" id="CPF" name="CPF" placeholder="@Messages.FormBeneficiarios_CPF_Placeholder" maxlength="14">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="Nome">@Messages.FormBeneficiarios_Nome:</label>
+                            <input required="required" type="text" class="form-control" id="Nome" name="Nome" placeholder="@Messages.FormBeneficiarios_Nome_Placeholder" maxlength="50">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <br />
+                            <input type="hidden" id="BeneficiarioId" name="BeneficiarioId" />
+                            <button type="submit" id="btnSalvar" class="btn btn-sm btn-success">@Messages.FormBeneficiarios_Salvar</button>
+                            <button type="button" id="btnCancelar" class="btn btn-sm btn-danger">@Messages.FormBeneficiarios_Cancelar</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <br />
+            <div class="row">
+                <div class="col-md-12">
+                    <table id="gridBeneficiarios" class="table"></table>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">@Messages.FormBeneficiarios_Fechar</button>
+        </div>
+    </div><!-- /.modal-content -->
+</div><!-- /.modal-dialog -->
